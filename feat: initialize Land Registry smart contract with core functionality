@@ -1,0 +1,227 @@
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.0;
+
+contract LandOwnership {
+    address public owner;
+    string public landDescription;
+    address public seller;
+    address public landInspector;
+    bool public isVerified;
+    bool public isTransferred;
+    
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event LandVerified(address indexed verifiedBy);
+    event NewLandRegistered(uint indexed landId, uint area, string city, string state, uint landPrice, uint propertyPID);
+    event NewBuyerRegistered(address indexed buyerId, string name, uint age, string city, string cnic, string email);
+    event NewSellerRegistered(address indexed sellerId, string name, uint age, string city, string cnic, string email);
+    event NewInspectorRegistered(address indexed inspectorId, string name, uint age, string designation);
+    event SellerVerified(address indexed verifiedBy, address indexed sellerId);
+    event LandRejected(address indexed rejectedBy, uint indexed landId);
+    event SellerDetailsUpdated(address indexed sellerId, string name, uint age, string city, string cnic, string email);
+    event BuyerVerified(address indexed verifiedBy, address indexed buyerId);
+    event BuyerDetailsUpdated(address indexed buyerId, string name, uint age, string city, string cnic, string email);
+    event LandOwnershipTransferred(address indexed previousOwner, address indexed newOwner, uint landId, uint amount);
+    
+    modifier onlySeller() {
+        require(msg.sender == seller, "Only the seller can perform this action.");
+        _;
+    }
+    
+    modifier onlyLandInspector() {
+        require(msg.sender == landInspector, "Only the land inspector can perform this action.");
+        _;
+    }
+    
+    struct Land {
+        uint landId;
+        uint area;
+        string city;
+        string state;
+        uint landPrice;
+        uint propertyPID;
+    }
+    
+    Land[] public landregistry;
+    
+    struct Landreg {
+        uint landId;
+        uint area;
+        string city;
+        string state;
+        uint landPrice;
+        uint propertyPID;
+        address landOwner;
+        bool isVerified;
+        bool isTransferred;
+    }
+    
+    mapping(uint => Landreg) public lands;
+    
+    struct Buyer {
+        string name;
+        uint age;
+        string city;
+        string cnic;
+        string email;
+        bool isVerified;
+    }
+    
+    mapping(address => Buyer) public buyers;
+    
+    struct Seller {
+        string name;
+        uint age;
+        string city;
+        string cnic;
+        string email;
+        bool isVerified;
+    }
+    
+    mapping(address => Seller) public SellerMapping;
+    
+    struct Inspector {
+        string name;
+        uint age;
+        string designation;
+    }
+    
+    mapping(address => Inspector) public InspectorMapping;
+    
+    constructor(string memory _landDescription, address _seller) {
+        owner = msg.sender;
+        landDescription = _landDescription;
+        seller = _seller;
+        landInspector = msg.sender;
+        isVerified = false;
+        isTransferred = false;
+        
+        InspectorMapping[msg.sender] = Inspector("", 0, "");
+        emit NewInspectorRegistered(msg.sender, "", 0, "");
+    }
+    
+    function registerInspector(address _inspectorId, string memory _name, uint _age, string memory _designation) public {
+        require(msg.sender == owner, "Only the owner can register a new inspector.");
+        InspectorMapping[_inspectorId] = Inspector(_name, _age, _designation);
+        emit NewInspectorRegistered(_inspectorId, _name, _age, _designation);
+    }
+    
+    function verifyLand() public onlyLandInspector {
+        isVerified = true;
+        emit LandVerified(msg.sender);
+    }
+    
+    function transferOwnership(address newOwner) payable public onlySeller {
+        require(isVerified == true, "Land must be verified before ownership can be transferred.");
+        require(isTransferred == false, "Ownership has already been transferred.");
+        owner = newOwner;
+        isTransferred = true;
+        emit OwnershipTransferred(msg.sender, newOwner);
+    }
+    
+    function registerLand(uint _landId, uint _area, string memory _city, string memory _state, uint _landPrice, uint _propertyPID) public onlySeller {
+        require(SellerMapping[seller].isVerified == true, "Seller must be verified by land inspector before adding land details.");
+        Land memory newLand = Land(_landId, _area, _city, _state, _landPrice, _propertyPID);
+        landregistry.push(newLand);
+        lands[_landId] = Landreg(_landId, _area, _city, _state, _landPrice, _propertyPID, seller, false, false);
+        emit NewLandRegistered(_landId, _area, _city, _state, _landPrice, _propertyPID);
+    }
+    
+    function registerBuyer(string memory _name, uint _age, string memory _city, string memory _cnic, string memory _email) public {
+        buyers[msg.sender] = Buyer(_name, _age, _city, _cnic, _email, false);
+        emit NewBuyerRegistered(msg.sender, _name, _age, _city, _cnic, _email);
+    }
+    
+    function registerSeller(string memory _name, uint _age, string memory _city, string memory _cnic, string memory _email) public {
+        SellerMapping[msg.sender] = Seller(_name, _age, _city, _cnic, _email, false);
+        emit NewSellerRegistered(msg.sender, _name, _age, _city, _cnic, _email);
+    }
+    
+    function verifySeller(address _sellerId) public onlyLandInspector {
+        SellerMapping[_sellerId].isVerified = true;
+        emit SellerVerified(msg.sender, _sellerId);
+    }
+    
+    function rejectLand(uint _landId) public onlyLandInspector {
+        lands[_landId].isVerified = false;
+        emit LandRejected(msg.sender, _landId);
+    }
+    
+    function updateSellerDetails(string memory _name, uint _age, string memory _city, string memory _cnic, string memory _email) public {
+        Seller storage sellerDetails = SellerMapping[msg.sender];
+        require(sellerDetails.isVerified == true, "Seller must be verified by land inspector before updating details.");
+        sellerDetails.name = _name;
+        sellerDetails.age = _age;
+        sellerDetails.city = _city;
+        sellerDetails.cnic = _cnic;
+        sellerDetails.email = _email;
+        emit SellerDetailsUpdated(msg.sender, _name, _age, _city, _cnic, _email);
+    }
+    
+    function verifyBuyer(address _buyerId) public onlyLandInspector {
+        buyers[_buyerId].isVerified = true;
+        emit BuyerVerified(msg.sender, _buyerId);
+    }
+    
+    function updateBuyerDetails(string memory _name, uint _age, string memory _city, string memory _cnic, string memory _email) public {
+        Buyer storage buyerDetails = buyers[msg.sender];
+        require(buyerDetails.isVerified == true, "Buyer must be verified by land inspector before updating details.");
+        buyerDetails.name = _name;
+        buyerDetails.age = _age;
+        buyerDetails.city = _city;
+        buyerDetails.cnic = _cnic;
+        buyerDetails.email = _email;
+        emit BuyerDetailsUpdated(msg.sender, _name, _age, _city, _cnic, _email);
+    }
+    
+    function transferLandOwnership(address _buyerId, uint _landId, uint _amount) public onlySeller {
+        require(isVerified == true, "Land must be verified before ownership can be transferred.");
+        require(buyers[_buyerId].isVerified == true, "Buyer must be verified by land inspector before ownership can be transferred.");
+        require(lands[_landId].isTransferred == false, "Ownership of land has already been transferred.");
+        require(msg.sender == lands[_landId].landOwner, "Only the current owner of the land can transfer ownership.");
+        
+        address previousOwner = lands[_landId].landOwner;
+        lands[_landId].landOwner = _buyerId;
+        lands[_landId].isTransferred = true;
+        emit LandOwnershipTransferred(previousOwner, _buyerId, _landId, _amount);
+    }
+    
+    function checkLandOwner(uint _landId) public view returns (bool) {
+        return msg.sender == lands[_landId].landOwner;
+    }
+    
+    function checkLandVerified(uint _landId) public view returns (bool) {
+        return lands[_landId].isVerified;
+    }
+    
+    function checkSellerVerified() public view returns (bool) {
+        return SellerMapping[msg.sender].isVerified;
+    }
+    
+    function checkBuyerVerified() public view returns (bool) {
+        return buyers[msg.sender].isVerified;
+    }
+    
+    function checkLandInspector() public view returns (bool) {
+        return msg.sender == landInspector;
+    }
+    
+    function getLandCity(uint _landId) public view returns (string memory) {
+        return lands[_landId].city;
+    }
+    
+    function getLandPrice(uint _landId) public view returns (uint) {
+        return lands[_landId].landPrice;
+    }
+    
+    function getArea(uint _landId) public view returns (uint) {
+        return lands[_landId].area;
+    }
+    
+    function isBuyer(address _buyerId) public view returns (bool) {
+        return buyers[_buyerId].isVerified;
+    }
+    
+    function isSeller(address _sellerId) public view returns (bool) {
+        return SellerMapping[_sellerId].isVerified;
+    }
+}
