@@ -1,0 +1,712 @@
+import React, { useState, useEffect } from 'react';
+import './LandOwnership.css';
+
+const LandOwnership = () => {
+  // State management
+  const [currentAccount, setCurrentAccount] = useState('');
+  const [landDescription, setLandDescription] = useState('');
+  const [seller, setSeller] = useState('');
+  const [isVerified, setIsVerified] = useState(false);
+  const [isTransferred, setIsTransferred] = useState(false);
+  const [activeTab, setActiveTab] = useState('dashboard');
+  
+  // Form states
+  const [landForm, setLandForm] = useState({
+    landId: '',
+    area: '',
+    city: '',
+    state: '',
+    landPrice: '',
+    propertyPID: ''
+  });
+  
+  const [buyerForm, setBuyerForm] = useState({
+    name: '',
+    age: '',
+    city: '',
+    cnic: '',
+    email: ''
+  });
+  
+  const [sellerForm, setSellerForm] = useState({
+    name: '',
+    age: '',
+    city: '',
+    cnic: '',
+    email: ''
+  });
+  
+  const [inspectorForm, setInspectorForm] = useState({
+    name: '',
+    age: '',
+    designation: ''
+  });
+  
+  const [transferForm, setTransferForm] = useState({
+    buyerId: '',
+    landId: '',
+    amount: ''
+  });
+  
+  const [verificationForm, setVerificationForm] = useState({
+    sellerId: '',
+    buyerId: '',
+    landId: ''
+  });
+
+  // Mock data for demonstration
+  const [lands, setLands] = useState([]);
+  const [buyers, setBuyers] = useState([]);
+  const [sellers, setSellers] = useState([]);
+  const [inspectors, setInspectors] = useState([]);
+
+  // Initialize with some mock data for demonstration
+  useEffect(() => {
+    // This would be replaced with actual contract calls
+    setLands([
+      { landId: 1, area: 2000, city: 'Islamabad', state: 'Federal', landPrice: 5000000, propertyPID: 12345, isVerified: true, isTransferred: false },
+      { landId: 2, area: 1500, city: 'Lahore', state: 'Punjab', landPrice: 3500000, propertyPID: 67890, isVerified: false, isTransferred: false }
+    ]);
+    
+    setBuyers([
+      { address: '0x123...', name: 'Ali Ahmed', age: 35, city: 'Karachi', cnic: '42101-1234567-8', email: 'ali.ahmed@email.com', isVerified: true },
+      { address: '0x456...', name: 'Fatima Khan', age: 42, city: 'Islamabad', cnic: '42101-7654321-9', email: 'fatima.khan@email.com', isVerified: false }
+    ]);
+    
+    setSellers([
+      { address: '0x789...', name: 'Hassan Mahmood', age: 50, city: 'Lahore', cnic: '42101-9876543-2', email: 'hassan@email.com', isVerified: true },
+      { address: '0xabc...', name: 'Sara Riaz', age: 38, city: 'Rawalpindi', cnic: '42101-2468135-7', email: 'sara.riaz@email.com', isVerified: false }
+    ]);
+    
+    setInspectors([
+      { address: '0xdef...', name: 'Inspector General', age: 45, designation: 'Senior Land Inspector' }
+    ]);
+  }, []);
+
+  // Form handlers
+  const handleLandFormChange = (e) => {
+    const { name, value } = e.target;
+    setLandForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleBuyerFormChange = (e) => {
+    const { name, value } = e.target;
+    setBuyerForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSellerFormChange = (e) => {
+    const { name, value } = e.target;
+    setSellerForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleInspectorFormChange = (e) => {
+    const { name, value } = e.target;
+    setInspectorForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleTransferFormChange = (e) => {
+    const { name, value } = e.target;
+    setTransferForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleVerificationFormChange = (e) => {
+    const { name, value } = e.target;
+    setVerificationForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Form submission handlers (would connect to contract in real implementation)
+  const handleRegisterLand = (e) => {
+    e.preventDefault();
+    alert(`Land registered with ID: ${landForm.landId}`);
+    // Here you would call the registerLand function on your contract
+  };
+
+  const handleRegisterBuyer = (e) => {
+    e.preventDefault();
+    alert(`Buyer registered: ${buyerForm.name}`);
+    // Here you would call the registerBuyer function on your contract
+  };
+
+  const handleRegisterSeller = (e) => {
+    e.preventDefault();
+    alert(`Seller registered: ${sellerForm.name}`);
+    // Here you would call the registerSeller function on your contract
+  };
+
+  const handleRegisterInspector = (e) => {
+    e.preventDefault();
+    alert(`Inspector registered: ${inspectorForm.name}`);
+    // Here you would call the registerInspector function on your contract
+  };
+
+  const handleTransferOwnership = (e) => {
+    e.preventDefault();
+    alert(`Ownership transferred for land ID: ${transferForm.landId}`);
+    // Here you would call the transferLandOwnership function on your contract
+  };
+
+  const handleVerifyLand = () => {
+    alert('Land verified successfully!');
+    // Here you would call the verifyLand function on your contract
+  };
+
+  const handleVerifySeller = () => {
+    alert(`Seller ${verificationForm.sellerId} verified successfully!`);
+    // Here you would call the verifySeller function on your contract
+  };
+
+  const handleVerifyBuyer = () => {
+    alert(`Buyer ${verificationForm.buyerId} verified successfully!`);
+    // Here you would call the verifyBuyer function on your contract
+  };
+
+  const handleRejectLand = () => {
+    alert(`Land ${verificationForm.landId} rejected!`);
+    // Here you would call the rejectLand function on your contract
+  };
+
+  return (
+    <div className="land-ownership-app">
+      <header className="app-header">
+        <h1>Land Ownership Management System</h1>
+        <div className="account-info">
+          <span>Connected Account: {currentAccount || 'Not connected'}</span>
+        </div>
+      </header>
+
+      <nav className="app-nav">
+        <button 
+          className={activeTab === 'dashboard' ? 'active' : ''} 
+          onClick={() => setActiveTab('dashboard')}
+        >
+          Dashboard
+        </button>
+        <button 
+          className={activeTab === 'lands' ? 'active' : ''} 
+          onClick={() => setActiveTab('lands')}
+        >
+          Lands
+        </button>
+        <button 
+          className={activeTab === 'buyers' ? 'active' : ''} 
+          onClick={() => setActiveTab('buyers')}
+        >
+          Buyers
+        </button>
+        <button 
+          className={activeTab === 'sellers' ? 'active' : ''} 
+          onClick={() => setActiveTab('sellers')}
+        >
+          Sellers
+        </button>
+        <button 
+          className={activeTab === 'inspectors' ? 'active' : ''} 
+          onClick={() => setActiveTab('inspectors')}
+        >
+          Inspectors
+        </button>
+        <button 
+          className={activeTab === 'transactions' ? 'active' : ''} 
+          onClick={() => setActiveTab('transactions')}
+        >
+          Transactions
+        </button>
+      </nav>
+
+      <main className="app-main">
+        {activeTab === 'dashboard' && (
+          <div className="dashboard">
+            <h2>Dashboard</h2>
+            <div className="stats">
+              <div className="stat-card">
+                <h3>Total Lands</h3>
+                <p>{lands.length}</p>
+              </div>
+              <div className="stat-card">
+                <h3>Verified Lands</h3>
+                <p>{lands.filter(land => land.isVerified).length}</p>
+              </div>
+              <div className="stat-card">
+                <h3>Registered Buyers</h3>
+                <p>{buyers.length}</p>
+              </div>
+              <div className="stat-card">
+                <h3>Registered Sellers</h3>
+                <p>{sellers.length}</p>
+              </div>
+            </div>
+            
+            <div className="recent-activities">
+              <h3>Recent Activities</h3>
+              <ul>
+                <li>Land ID 1 ownership transferred to 0x123...</li>
+                <li>New buyer registered: Ali Ahmed</li>
+                <li>Land ID 2 verified by inspector</li>
+                <li>New seller registered: Hassan Mahmood</li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'lands' && (
+          <div className="lands-section">
+            <h2>Land Management</h2>
+            
+            <div className="action-cards">
+              <div className="card">
+                <h3>Register New Land</h3>
+                <form onSubmit={handleRegisterLand}>
+                  <input 
+                    type="number" 
+                    name="landId" 
+                    placeholder="Land ID" 
+                    value={landForm.landId} 
+                    onChange={handleLandFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="number" 
+                    name="area" 
+                    placeholder="Area (sq ft)" 
+                    value={landForm.area} 
+                    onChange={handleLandFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="text" 
+                    name="city" 
+                    placeholder="City" 
+                    value={landForm.city} 
+                    onChange={handleLandFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="text" 
+                    name="state" 
+                    placeholder="State" 
+                    value={landForm.state} 
+                    onChange={handleLandFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="number" 
+                    name="landPrice" 
+                    placeholder="Price (Wei)" 
+                    value={landForm.landPrice} 
+                    onChange={handleLandFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="number" 
+                    name="propertyPID" 
+                    placeholder="Property PID" 
+                    value={landForm.propertyPID} 
+                    onChange={handleLandFormChange} 
+                    required 
+                  />
+                  <button type="submit">Register Land</button>
+                </form>
+              </div>
+              
+              <div className="card">
+                <h3>Land Verification</h3>
+                <div className="verification-controls">
+                  <input 
+                    type="number" 
+                    placeholder="Land ID" 
+                    value={verificationForm.landId} 
+                    onChange={(e) => setVerificationForm({...verificationForm, landId: e.target.value})} 
+                  />
+                  <div className="button-group">
+                    <button onClick={handleVerifyLand}>Verify Land</button>
+                    <button onClick={handleRejectLand} className="danger">Reject Land</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <h3>Registered Lands</h3>
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Area</th>
+                    <th>City</th>
+                    <th>State</th>
+                    <th>Price</th>
+                    <th>PID</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {lands.map(land => (
+                    <tr key={land.landId}>
+                      <td>{land.landId}</td>
+                      <td>{land.area} sq ft</td>
+                      <td>{land.city}</td>
+                      <td>{land.state}</td>
+                      <td>{land.landPrice} Wei</td>
+                      <td>{land.propertyPID}</td>
+                      <td>
+                        <span className={`status ${land.isVerified ? 'verified' : 'pending'}`}>
+                          {land.isVerified ? 'Verified' : 'Pending'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'buyers' && (
+          <div className="buyers-section">
+            <h2>Buyer Management</h2>
+            
+            <div className="action-cards">
+              <div className="card">
+                <h3>Register New Buyer</h3>
+                <form onSubmit={handleRegisterBuyer}>
+                  <input 
+                    type="text" 
+                    name="name" 
+                    placeholder="Full Name" 
+                    value={buyerForm.name} 
+                    onChange={handleBuyerFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="number" 
+                    name="age" 
+                    placeholder="Age" 
+                    value={buyerForm.age} 
+                    onChange={handleBuyerFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="text" 
+                    name="city" 
+                    placeholder="City" 
+                    value={buyerForm.city} 
+                    onChange={handleBuyerFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="text" 
+                    name="cnic" 
+                    placeholder="CNIC" 
+                    value={buyerForm.cnic} 
+                    onChange={handleBuyerFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="email" 
+                    name="email" 
+                    placeholder="Email" 
+                    value={buyerForm.email} 
+                    onChange={handleBuyerFormChange} 
+                    required 
+                  />
+                  <button type="submit">Register Buyer</button>
+                </form>
+              </div>
+              
+              <div className="card">
+                <h3>Buyer Verification</h3>
+                <div className="verification-controls">
+                  <input 
+                    type="text" 
+                    placeholder="Buyer Address" 
+                    value={verificationForm.buyerId} 
+                    onChange={(e) => setVerificationForm({...verificationForm, buyerId: e.target.value})} 
+                  />
+                  <button onClick={handleVerifyBuyer}>Verify Buyer</button>
+                </div>
+              </div>
+            </div>
+            
+            <h3>Registered Buyers</h3>
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Address</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>City</th>
+                    <th>CNIC</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {buyers.map(buyer => (
+                    <tr key={buyer.address}>
+                      <td>{buyer.address}</td>
+                      <td>{buyer.name}</td>
+                      <td>{buyer.age}</td>
+                      <td>{buyer.city}</td>
+                      <td>{buyer.cnic}</td>
+                      <td>{buyer.email}</td>
+                      <td>
+                        <span className={`status ${buyer.isVerified ? 'verified' : 'pending'}`}>
+                          {buyer.isVerified ? 'Verified' : 'Pending'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'sellers' && (
+          <div className="sellers-section">
+            <h2>Seller Management</h2>
+            
+            <div className="action-cards">
+              <div className="card">
+                <h3>Register New Seller</h3>
+                <form onSubmit={handleRegisterSeller}>
+                  <input 
+                    type="text" 
+                    name="name" 
+                    placeholder="Full Name" 
+                    value={sellerForm.name} 
+                    onChange={handleSellerFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="number" 
+                    name="age" 
+                    placeholder="Age" 
+                    value={sellerForm.age} 
+                    onChange={handleSellerFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="text" 
+                    name="city" 
+                    placeholder="City" 
+                    value={sellerForm.city} 
+                    onChange={handleSellerFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="text" 
+                    name="cnic" 
+                    placeholder="CNIC" 
+                    value={sellerForm.cnic} 
+                    onChange={handleSellerFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="email" 
+                    name="email" 
+                    placeholder="Email" 
+                    value={sellerForm.email} 
+                    onChange={handleSellerFormChange} 
+                    required 
+                  />
+                  <button type="submit">Register Seller</button>
+                </form>
+              </div>
+              
+              <div className="card">
+                <h3>Seller Verification</h3>
+                <div className="verification-controls">
+                  <input 
+                    type="text" 
+                    placeholder="Seller Address" 
+                    value={verificationForm.sellerId} 
+                    onChange={(e) => setVerificationForm({...verificationForm, sellerId: e.target.value})} 
+                  />
+                  <button onClick={handleVerifySeller}>Verify Seller</button>
+                </div>
+              </div>
+            </div>
+            
+            <h3>Registered Sellers</h3>
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Address</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>City</th>
+                    <th>CNIC</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sellers.map(seller => (
+                    <tr key={seller.address}>
+                      <td>{seller.address}</td>
+                      <td>{seller.name}</td>
+                      <td>{seller.age}</td>
+                      <td>{seller.city}</td>
+                      <td>{seller.cnic}</td>
+                      <td>{seller.email}</td>
+                      <td>
+                        <span className={`status ${seller.isVerified ? 'verified' : 'pending'}`}>
+                          {seller.isVerified ? 'Verified' : 'Pending'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'inspectors' && (
+          <div className="inspectors-section">
+            <h2>Inspector Management</h2>
+            
+            <div className="action-cards">
+              <div className="card">
+                <h3>Register New Inspector</h3>
+                <form onSubmit={handleRegisterInspector}>
+                  <input 
+                    type="text" 
+                    name="name" 
+                    placeholder="Full Name" 
+                    value={inspectorForm.name} 
+                    onChange={handleInspectorFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="number" 
+                    name="age" 
+                    placeholder="Age" 
+                    value={inspectorForm.age} 
+                    onChange={handleInspectorFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="text" 
+                    name="designation" 
+                    placeholder="Designation" 
+                    value={inspectorForm.designation} 
+                    onChange={handleInspectorFormChange} 
+                    required 
+                  />
+                  <button type="submit">Register Inspector</button>
+                </form>
+              </div>
+            </div>
+            
+            <h3>Registered Inspectors</h3>
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Address</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Designation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {inspectors.map(inspector => (
+                    <tr key={inspector.address}>
+                      <td>{inspector.address}</td>
+                      <td>{inspector.name}</td>
+                      <td>{inspector.age}</td>
+                      <td>{inspector.designation}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'transactions' && (
+          <div className="transactions-section">
+            <h2>Ownership Transfer</h2>
+            
+            <div className="action-cards">
+              <div className="card">
+                <h3>Transfer Land Ownership</h3>
+                <form onSubmit={handleTransferOwnership}>
+                  <input 
+                    type="text" 
+                    name="buyerId" 
+                    placeholder="Buyer Address" 
+                    value={transferForm.buyerId} 
+                    onChange={handleTransferFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="number" 
+                    name="landId" 
+                    placeholder="Land ID" 
+                    value={transferForm.landId} 
+                    onChange={handleTransferFormChange} 
+                    required 
+                  />
+                  <input 
+                    type="number" 
+                    name="amount" 
+                    placeholder="Amount (Wei)" 
+                    value={transferForm.amount} 
+                    onChange={handleTransferFormChange} 
+                    required 
+                  />
+                  <button type="submit">Transfer Ownership</button>
+                </form>
+              </div>
+            </div>
+            
+            <h3>Recent Transactions</h3>
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Transaction Hash</th>
+                    <th>Land ID</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Amount</th>
+                    <th>Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>0x4a4b3c2d1e0f...</td>
+                    <td>1</td>
+                    <td>0x789...</td>
+                    <td>0x123...</td>
+                    <td>5,000,000 Wei</td>
+                    <td>2023-05-15 14:32</td>
+                  </tr>
+                  <tr>
+                    <td>0x9a8b7c6d5e4f...</td>
+                    <td>3</td>
+                    <td>0xabc...</td>
+                    <td>0x456...</td>
+                    <td>3,200,000 Wei</td>
+                    <td>2023-04-28 09:15</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </main>
+
+      <footer className="app-footer">
+        <p>Land Ownership Management System &copy; 2023</p>
+      </footer>
+    </div>
+  );
+};
+
+export default LandOwnership;
